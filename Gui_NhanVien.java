@@ -44,8 +44,7 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 	DefaultTableModel model;
 	JTable table;
 	dsNhanVien list = new dsNhanVien();
-	String path = "src/data/dsNV_new.txt";
-
+	String path ="src/data/dsNV.txt";
 	public Gui_NhanVien() {
 		super("Trần Duy Khang");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -148,7 +147,7 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 		JPanel pnLuongCenter = new JPanel(new BorderLayout());
 		pnLuongCenter.add(txtLuong, BorderLayout.CENTER);
 		pnLuongCenter.add(pnPhai, BorderLayout.EAST);
-
+		
 		pnLuong.add(lblLuong, BorderLayout.WEST);
 		pnLuong.add(pnLuongCenter, BorderLayout.CENTER);
 		pnNhap.add(pnLuong);
@@ -180,7 +179,7 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 		};
 		txtTrang.getDocument().addDocumentListener(docListener);
 		txtLuong.getDocument().addDocumentListener(docListener);
-		tinhThucNhan(); // Khởi tạo tính liền lúc mới bật ứng dụng
+		tinhThucNhan(); 
 
 		pnNhap.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 		// table
@@ -190,7 +189,13 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 
 		model = new DefaultTableModel(new String[] {
 				"Mã", "Họ", "Tên", "Tuổi", "Phái", "Tháng", "Phong Ban", "Lương", "Thực Nhận"
-		}, 0);
+		}, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// Khóa cột 0 (Mã) và cột 8 (Thực Nhận) không cho sửa trực tiếp trên bảng
+				return column != 0 && column != 8;
+			}
+		};
 
 		table = new JTable(model);
 		// định dạng số tiền
@@ -270,6 +275,7 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 				if (e.getType() == TableModelEvent.UPDATE) {
 					int row = e.getFirstRow();
 					int col = e.getColumn();
+					
 					if (row >= 0 && col >= 0) {
 						try {
 							String ma = model.getValueAt(row, 0).toString();
@@ -294,13 +300,29 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 								}
 							}
 						} catch (Exception ex) {
-							// Ignored
+							String loi = ex.getMessage();
+							if (ex instanceof NumberFormatException) {
+								loi = "Dữ liệu nhập vào phải là số hợp lệ!";
+							}
+							JOptionPane.showMessageDialog(Gui_NhanVien.this, loi, "Lỗi", JOptionPane.ERROR_MESSAGE);
+							
+							// Trả lại giá trị cũ lên Table
+							String ma = model.getValueAt(row, 0).toString();
+							NhanVien nv = list.timNhanVien(ma);
+							if (nv != null) {
+								if (col == 1) model.setValueAt(nv.getHoNV(), row, col);
+								else if (col == 2) model.setValueAt(nv.getTenNV(), row, col);
+								else if (col == 3) model.setValueAt(nv.getTuoi(), row, col);
+								else if (col == 4) model.setValueAt(nv.isPhai() ? "Nữ" : "Nam", row, col);
+								else if (col == 5) model.setValueAt(nv.getThang(), row, col);
+								else if (col == 6) model.setValueAt(nv.getPhongBan(), row, col);
+								else if (col == 7) model.setValueAt(nv.getLuong(), row, col);
+							}
 						}
 					}
-
-					row = table.getSelectedRow();
-					if (row >= 0 && row == e.getFirstRow()) {
-						loadDataToForm(row);
+					int selectedRow = table.getSelectedRow();
+					if (selectedRow >= 0 && selectedRow == e.getFirstRow()) {
+						loadDataToForm(selectedRow);
 					}
 				}
 			}
@@ -380,69 +402,29 @@ public class Gui_NhanVien extends JFrame implements ActionListener {
 			String phongBan = cboPhongBan.getSelectedItem().toString();
 			String luong = txtLuong.getText().trim();
 
-			if (ma.isEmpty() || ho.isEmpty() || ten.isEmpty() || tuoiStr.isEmpty() || thang.isEmpty()
-					|| luong.isEmpty()) {
-				JOptionPane.showMessageDialog(this,
-						"Vui lòng nhập đầy đủ thông tin",
-						"Lỗi",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			int tuoiInt = 0;
 			try {
-				tuoiInt = Integer.parseInt(tuoiStr);
-				if (tuoiInt < 18 || tuoiInt > 60) {
-					JOptionPane.showMessageDialog(this, "Tuổi phải từ 18 đến 60", "Lỗi",
+				int tuoiInt = Integer.parseInt(tuoiStr);
+				int thangInt = Integer.parseInt(thang);
+				double luongDouble = Double.parseDouble(luong);
+				
+				NhanVien nv = new NhanVien(ma, ho, ten, tuoiInt, phai, phongBan, thangInt, luongDouble);
+				
+				if (list.themNhanVien(nv)) {
+					loadDataToTable();
+					JOptionPane.showMessageDialog(this,
+							"Thêm thành công",
+							"Thông báo",
+							JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"Mã nhân viên không được trùng",
+							"Lỗi",
 							JOptionPane.ERROR_MESSAGE);
-					return;
 				}
 			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(this, "Tuổi phải là một số nguyên", "Lỗi", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			int thangInt = 0;
-			try {
-				thangInt = Integer.parseInt(thang);
-				if (thangInt <= 0) {
-					JOptionPane.showMessageDialog(this, "Tháng không được âm hoặc bằng 0", "Lỗi",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(this, "Tháng phải là một số nguyên", "Lỗi", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			double luongDouble = 0;
-			try {
-				luongDouble = Double.parseDouble(luong);
-				if (luongDouble <= 0) {
-					JOptionPane.showMessageDialog(this, "Lương không được âm hoặc bằng 0", "Lỗi",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(this, "Lương phải là một số thực", "Lỗi", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			NhanVien nv = new NhanVien(ma, ho, ten, tuoiInt, phai, phongBan, thangInt, luongDouble);
-			if (nv == null)
-				return;
-			if (list.themNhanVien(nv)) {
-				loadDataToTable();
-				JOptionPane.showMessageDialog(this,
-						"Thêm thành công",
-						"Thông báo",
-						JOptionPane.INFORMATION_MESSAGE);
-				return;
-			} else {
-				JOptionPane.showMessageDialog(this,
-						"Mã nhân viên không được trùng",
-						"Lỗi",
-						JOptionPane.ERROR_MESSAGE);
-				return;
+				JOptionPane.showMessageDialog(this, "Dữ liệu Tuổi, Tháng và Lương phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+			} catch (IllegalArgumentException ex) {
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		if (e.getSource() == btnXoaTrang) {

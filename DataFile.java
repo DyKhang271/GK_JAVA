@@ -52,24 +52,24 @@ public class DataFile {
 				if (data.length >= 6 && data.length <= 8) {
 					if (data.length == 6) {
 						ds.themNhanVien(new NhanVien(
-								data[0],
-								data[1],
-								data[2],
+								data[0].trim(),
+								data[1].trim(),
+								data[2].trim(),
 								20,
 								false,
-								data[3],
-								Integer.parseInt(data[4]),
-								Double.parseDouble(data[5])));
+								data[3].trim(),
+								Integer.parseInt(data[4].trim()),
+								Double.parseDouble(data[5].trim())));
 					} else if (data.length == 8) {
 						ds.themNhanVien(new NhanVien(
-								data[0],
-								data[1],
-								data[2],
-								Integer.parseInt(data[3]),
-								data[4].equals("Nu"),
-								data[5],
-								Integer.parseInt(data[6]),
-								Double.parseDouble(data[7])));
+								data[0].trim(),
+								data[1].trim(),
+								data[2].trim(),
+								Integer.parseInt(data[3].trim()),
+								data[4].trim().equals("Nu"),
+								data[5].trim(),
+								Integer.parseInt(data[6].trim()),
+								Double.parseDouble(data[7].trim())));
 					}
 				}
 			}

@@ -21,13 +21,13 @@ public class NhanVien {
 			double luong) {
 		super();
 		setMaNV(maNV);
-		this.hoNV = hoNV;
-		this.tenNV = tenNV;
-		this.tuoi = tuoi;
-		this.phai = phai;
-		this.phongBan = phongBan;
-		this.thang = thang;
-		this.luong = luong;
+		setHoNV(hoNV);
+		setTenNV(tenNV);
+		setTuoi(tuoi);
+		setPhai(phai);
+		setPhongBan(phongBan);
+		setThang(thang);
+		setLuong(luong);
 	}
 
 	public int getTuoi() {
@@ -35,6 +35,8 @@ public class NhanVien {
 	}
 
 	public void setTuoi(int tuoi) {
+		if (tuoi < 18 || tuoi > 60)
+			throw new IllegalArgumentException("Tuổi phải từ 18 đến 60");
 		this.tuoi = tuoi;
 	}
 
@@ -51,8 +53,8 @@ public class NhanVien {
 	}
 
 	public void setMaNV(String maNV) {
-		if (maNV.isEmpty() || maNV == null)
-			throw new RuntimeException("Ma khong duoc trong");
+		if (maNV == null || maNV.trim().isEmpty())
+			throw new IllegalArgumentException("Mã không được rỗng");
 		else
 			this.maNV = maNV;
 	}
@@ -62,6 +64,8 @@ public class NhanVien {
 	}
 
 	public void setHoNV(String hoNV) {
+		if (hoNV == null || hoNV.trim().isEmpty())
+			throw new IllegalArgumentException("Họ không được rỗng");
 		this.hoNV = hoNV;
 	}
 
@@ -70,6 +74,8 @@ public class NhanVien {
 	}
 
 	public void setTenNV(String tenNV) {
+		if (tenNV == null || tenNV.trim().isEmpty())
+			throw new IllegalArgumentException("Tên không được rỗng");
 		this.tenNV = tenNV;
 	}
 
@@ -86,6 +92,8 @@ public class NhanVien {
 	}
 
 	public void setThang(int thang) {
+		if (thang <= 0)
+			throw new IllegalArgumentException("Tháng không được âm hoặc bằng 0");
 		this.thang = thang;
 	}
 
@@ -94,6 +102,8 @@ public class NhanVien {
 	}
 
 	public void setLuong(double luong) {
+		if (luong <= 0)
+			throw new IllegalArgumentException("Lương không được âm hoặc bằng 0");
 		this.luong = luong;
 	}
 
