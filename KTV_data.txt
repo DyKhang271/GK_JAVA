@@ -1,0 +1,6 @@
+MaKTV,TenKTV,ThamNien,ChuyenMon,sdt
+12334,Nguyễn Văn A,5,Điện lạnh,0901234567
+12335,Trần Thị B,8,Cơ Điện,0912345678
+12336,Lê Văn C,1,Máy Tính,0923456789
+12337,Phạm Đình D,12,Điện lạnh,0934567890
+12338,Hoàng Bảo,3,Cơ Điện,0945678901

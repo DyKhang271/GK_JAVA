@@ -1,0 +1,7 @@
+MaNV,HoNV,TenNV,Phai,Tuoi,PhongBan,Thang,Luong
+NV001,Trần,Duy Khang,Nam,21,Nhân sự,15,1000.0
+NV002,Nguyễn,Thị Bích,Nu,25,Kinh doanh,12,1200.0
+NV003,Lê,Văn Tèo,Nam,30,Nhân sự,24,1500.0
+NV004,Phạm,Thị Nở,Nu,28,Kinh doanh,8,1100.0
+NV005,Đinh,Văn Quá,Nam,22,Nhân sự,5,900.0
+NV006,Hoàng,Thanh Mai,Nu,24,Kinh doanh,10,1050.5
